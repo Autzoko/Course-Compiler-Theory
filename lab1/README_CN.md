@@ -132,3 +132,6 @@ int main()
 (12,return)(2,0)(17,;)
 (24,})
 ```
+
+# 附录
+详细文件见https://github.com/Autzoko/Course-Compiler-Theory/tree/main/lab1。
