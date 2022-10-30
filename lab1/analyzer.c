@@ -21,6 +21,8 @@ int cat_identifier(char s[])
 {
 	if(strcmp(s, "void") == 0)
 		return VOID;
+	else if(strcmp(s, "int") == 0)
+		return INT;
 	else if(strcmp(s, "float") == 0)
 		return FLOAT;
 	else if(strcmp(s, "double") == 0)
@@ -95,6 +97,12 @@ int cat_doubleChar_first(char c)
 
 int cat_doubleChar(int sign, char c)
 {
+	if(c == ' ')
+	{
+		
+		return sign;
+	}
+
 	if(sign == GT)
 	{
 		if(c == '=')
@@ -188,39 +196,41 @@ int cat_doubleChar(int sign, char c)
 void write_doubleChar(int sign, FILE* fw)
 {
 	if(sign == GT)
-		fprintf(fw, "(%d, %c)\n", GT, ">=");
+		fprintf(fw, "(%d, %s) ", (int)GT, ">=");
 	else if(sign == LT)
-		fprintf(fw, "(%d, %c)", LT, "<=");
+		fprintf(fw, "(%d, %s)", (int)LT, "<=");
 	else if(sign == NE)
-		fprintf(fw, "(%d, %c)\n", NE, "!=");
+		fprintf(fw, "(%d, %s) ", (int)NE, "!=");
 	else if(sign == EQU)
-		fprintf(fw, "(%d, %c)\n", EQU, "==");
+		fprintf(fw, "(%d, %s) ", (int)EQU, "==");
 	else if(sign == SADD)
-		fprintf(fw, "(%d, %c)\n", SADD, "++");
+		fprintf(fw, "(%d, %s) ", (int)SADD, "++");
 	else if(sign == SMIN)
-		fprintf(fw, "(%d, %c)\n", SMIN, "--");
+		fprintf(fw, "(%d, %s) ", (int)SMIN, "--");
 	else if(sign == AADD)
-		fprintf(fw, "(%d, %c)\n", AADD, "+=");
+		fprintf(fw, "(%d, %s) ", (int)AADD, "+=");
 	else if(sign == AMIN)
-		fprintf(fw, "(%d, %c)\n", AMIN, "-=");
+		fprintf(fw, "(%d, %s) ", (int)AMIN, "-=");
 	else if(sign == AMUL)
-		fprintf(fw, "(%d, %c)\n", AMUL, "*=");
+		fprintf(fw, "(%d, %s) ", (int)AMUL, "*=");
 	else if(sign == ADIV)
-		fprintf(fw, "(%d, %c)\n", ADIV, "/=");
+		fprintf(fw, "(%d, %s) ", (int)ADIV, "/=");
 	else if(sign == LMOV)
-		fprintf(fw, "(%d, %c)\n", LMOV, "<<");
+		fprintf(fw, "(%d, %s) ", (int)LMOV, "<<");
 	else if(sign == RMOV)
-		fprintf(fw, "(%d, %c)\n", RMOV, ">>");
+		fprintf(fw, "(%d, %s) ", (int)RMOV, ">>");
 	else if(sign == AND)
-		fprintf(fw, "(%d, %c)\n", AND, "&&");
+		fprintf(fw, "(%d, %s) ", (int)AND, "&&");
 	else if(sign == OR)
-		fprintf(fw, "(%d, %c)\n", OR, "||");
+		fprintf(fw, "(%d, %s) ", (int)OR, "||");
 	else if(sign == NOTE)
-		fprintf(fw, "(%d, %c)\n", NOTE, "//");
+		fprintf(fw, "(%d, %s) ", (int)NOTE, "//");
 	else if(sign == NOTE_START)
-		fprintf(fw, "(%d, %c)\n", NOTE_START, "/*");
+		fprintf(fw, "(%d, %s) ", (int)NOTE_START, "/*");
 	else if(sign == NOTE_END)
-		fprintf(fw, "(%d, %c)\n", NOTE_END, "*/");
+		fprintf(fw, "(%d, %s) ", (int)NOTE_END, "*/");
+	else if(sign == MOV)
+		fprintf(fw, "(%d, %c) ", (int)MOV, "=");
 	else
 		return;
 }
@@ -234,32 +244,32 @@ int analyzer(FILE* fp, FILE* fw)
 
 	while(!feof(fp))
 	{
-		if(note_flag == 1)
-		{
-			while(1)
-			{
-				if(cat_doubleChar(cat_doubleChar_first(c), fgetc(fp)) == NOTE_END)
-				{
-					note_flag = 0;
-					break;
-				}
-				c = fgetc(fp);
-			}
-			c = fgetc(fp);
-		}
-		if(line_note_flag == 1)
-		{
-			while(1)
-			{
-				if(c == '\n')
-				{
-					line_note_flag = 0;
-					break;
-				}
-				c = fgetc(fp);
-			}
-			c = fgetc(fp);
-		}
+		//if(note_flag == 1)
+		//{
+		//	while(1)
+		//	{
+		//		if(cat_doubleChar(cat_doubleChar_first(c), fgetc(fp)) == NOTE_END)
+		//		{
+		//			note_flag = 0;
+		//			break;
+		//		}
+		//		c = fgetc(fp);
+		//	}
+		//	c = fgetc(fp);
+		//}
+		//if(line_note_flag == 1)
+		//{
+		//	while(1)
+		//	{
+		//		if(c == '\n')
+		//		{
+		//			line_note_flag = 0;
+		//			break;
+		//		}
+		//		c = fgetc(fp);
+		//	}
+		//	c = fgetc(fp);
+		//}
 
 		if(c == ' ' || c == '\t')
 		{
@@ -274,7 +284,7 @@ int analyzer(FILE* fp, FILE* fw)
 			continue;
 		}
 
-		else if(letter(c) == IDENTIFIER)
+		else if((int)letter(c) == (int)IDENTIFIER)
 		{
 			char string[64];
 			int i = 0;
@@ -283,13 +293,14 @@ int analyzer(FILE* fp, FILE* fw)
 			{
 				c = fgetc(fp);
 				string[i++] = c;
-			} while (letter(c) == IDENTIFIER || number(c) == IDENTIFIER);
+			} while ((int)letter(c) == (int)IDENTIFIER || (int)number(c) == (int)IDENTIFIER);
 			string[i - 1] = '\0';
 			int cat = cat_identifier(string);
-			fprintf(fw, "(%d, %s)\n", cat, string);
+			fprintf(fw, "(%d, %s) ", cat, string);
+			continue;
 		}
 
-		else if(number(c) == IDENTIFIER)
+		else if((int)number(c) == (int)IDENTIFIER)
 		{
 			char string[64];
 			int i = 0;
@@ -298,30 +309,36 @@ int analyzer(FILE* fp, FILE* fw)
 			{
 				c = fgetc(fp);
 				string[i++] = c;
-			} while (number(c) == IDENTIFIER);
+			} while ((int)number(c) == (int)IDENTIFIER);
 			string[i - 1] = '\0';
-			fprintf(fw, "(%d, %c)\n", UNSIGNED_INT, string);
+			int cat = UNSIGNED_INT;
+			fprintf(fw, "(%d, %c) ", cat, string);
+			continue;
 		}
 
 		else if(cat_singleChar(c) != 0)
 		{
-			fprintf(fw, "(%d, %c)\n", cat_singleChar(c), c);
+			fprintf(fw, "(%d, %c) ", (int)cat_singleChar(c), c);
 			c = fgetc(fp);
+			continue;
 		}
 
 		else if(cat_doubleChar_first(c) != 0)
 		{
 			int sign = cat_doubleChar(cat_doubleChar_first(c), fgetc(fp));
-			if(sign == NOTE_START)
+			if(sign == (int)NOTE_START)
 				note_flag = 1;
-			if(sign == NOTE)
+			if(sign == (int)NOTE)
 				line_note_flag = 1;
 			write_doubleChar(sign, fw);
+			continue;
 		}
 		
 		else
+		{
 			fprintf(fw, "error, unrecognized symbol!\n");
 			printf("error, unrecognized symbol!\n");
 			break;
+		}
 	}
 }
