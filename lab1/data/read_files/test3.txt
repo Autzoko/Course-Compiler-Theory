@@ -1,0 +1,6 @@
+int wuhu()
+{
+	/* NoNonO */
+	int a = 1;
+	return a;
+}

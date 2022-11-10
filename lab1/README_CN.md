@@ -134,4 +134,4 @@ int main()
 ```
 
 # 附录
-详细文件见https://github.com/Autzoko/Course-Compiler-Theory/tree/main/lab1。
+详细文件见https://github.com/Autzoko/Course-Compiler-Theory/tree/main/lab1
